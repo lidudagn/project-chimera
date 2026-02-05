@@ -1,16 +1,18 @@
 """Performance tests for Planner agent."""
 
+import time
+import pytest
+
 def test_planner_decomposition_performance():
-    """Test Planner can decompose 1000 tasks in parallel in < 5 seconds."""
+    """Test Planner decomposes 1000 tasks in < 5 seconds (SLA from spec)."""
     from agents.planner.task_decomposer import Planner
-    import time
     
     planner = Planner()
     
-    # Large campaign
+    # Large campaign that should generate ~1000 tasks
     campaign_goals = {
-        "objective": "Large scale campaign",
-        "budget": 100000  # Should generate 1000 tasks
+        "objective": "Large scale marketing campaign",
+        "budget": 100000  # 1000 tasks (100000/100 = 1000)
     }
     
     start_time = time.time()
@@ -20,8 +22,13 @@ def test_planner_decomposition_performance():
     elapsed = end_time - start_time
     task_count = len(tasks)
     
-    print(f"Planner decomposed {task_count} tasks in {elapsed:.2f} seconds")
+    print(f"⏱️  Planner Performance:")
+    print(f"   Tasks generated: {task_count}")
+    print(f"   Time elapsed: {elapsed:.3f} seconds")
+    print(f"   SLA: < 5.0 seconds")
     
-    # From spec: < 5 seconds for 1000 tasks
-    assert elapsed < 5.0, f"Planner too slow: {elapsed:.2f}s for {task_count} tasks (SLA: <5s)"
+    # Assertions from spec
     assert task_count == 1000, f"Expected 1000 tasks, got {task_count}"
+    assert elapsed < 5.0, f"Planner too slow: {elapsed:.3f}s (SLA: <5s)"
+    
+    print(f"✅ PASS: Decomposed {task_count} tasks in {elapsed:.3f}s (< 5.0s SLA)")
