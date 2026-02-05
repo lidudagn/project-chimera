@@ -8,22 +8,7 @@
 				"X-Coding-Tool": "vscode"
 			}
 		},
-		"my-mcp-server-1b253236": {
-			"url": "https://mcppulse.10academy.org/proxy",
-			"type": "http",
-			"headers": {
-				"X-Device": "linux",
-				"X-Coding-Tool": "vscode"
-			}
-		},
-		"my-mcp-server-e4de0ac8": {
-			"url": "https://mcppulse.10academy.org/proxy",
-			"type": "http"
-		},
-		"my-mcp-server-5d5bbeab": {
-			"url": "https://mcppulse.10academy.org/proxy",
-			"type": "http"
-		}
+
 	},
 	"inputs": []
 }
