@@ -97,3 +97,27 @@ def test_planner_generates_correct_task_count():
         tasks = planner.decompose(goals)
         assert len(tasks) == expected_count, \
             f"Budget {goals['budget']} should generate {expected_count} tasks, got {len(tasks)}"
+
+def test_no_duplicate_tasks_across_workers():
+    """Test no Worker receives duplicate tasks"""
+    planner = Planner()
+    campaign_goals = {"objective": "Test", "budget": 500}
+    workers = ["worker_1", "worker_2", "worker_3"]
+    
+    assignments = planner.assign_tasks(campaign_goals, workers)
+    
+    # Collect all task IDs across all workers
+    all_task_ids = []
+    for worker_tasks in assignments.values():
+        for task in worker_tasks:
+            all_task_ids.append(task["task_id"])
+    
+    # Check for duplicates
+    assert len(all_task_ids) == len(set(all_task_ids)), \
+        f"Duplicate task IDs found: {all_task_ids}"
+    
+    # Also verify each task appears only once
+    for worker in workers:
+        worker_task_ids = [task["task_id"] for task in assignments[worker]]
+        assert len(worker_task_ids) == len(set(worker_task_ids)), \
+            f"Worker {worker} has duplicate tasks"
