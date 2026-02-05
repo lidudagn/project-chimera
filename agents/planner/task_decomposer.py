@@ -15,3 +15,19 @@ class Planner:
                 "priority": "medium"
             }
         ]
+
+    def assign_tasks(self, goals, workers):
+        """Distribute tasks evenly among workers."""
+        # First decompose goals into tasks
+        tasks = self.decompose(goals)
+
+        # Initialize assignments dictionary
+        assignments = {worker: [] for worker in workers}
+
+        # Simple round-robin distribution
+        for i, task in enumerate(tasks):
+            worker_idx = i % len(workers)
+            worker = workers[worker_idx]
+            assignments[worker].append(task)
+
+        return assignments
