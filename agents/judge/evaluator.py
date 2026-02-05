@@ -4,19 +4,21 @@ class Judge:
     
     def evaluate(self, task_result):
         """Evaluate task result and make routing decision."""
+        # Extract confidence
         confidence = task_result.get("confidence", 0.0)
         task_id = task_result.get("task_id", "unknown")
         
-        # Check for HITL triggers first
-        if self._requires_hitl(task_result):
+        # Check for HITL triggers first (highest priority)
+        if self._requires_hitl_review(task_result):
             return {
                 "task_id": task_id,
                 "action": "escalate",
                 "reason": "HITL_REQUIRED",
-                "details": "Sensitive task requiring human review"
+                "details": "Sensitive task requiring human review",
+                "confidence": confidence
             }
         
-        # Route based on confidence
+        # Route based on confidence thresholds
         if confidence < 0.7:
             action = "escalate"
             reason = "LOW_CONFIDENCE"
@@ -34,17 +36,17 @@ class Judge:
             "confidence": confidence
         }
     
-    def _requires_hitl(self, task_result):
+    def _requires_hitl_review(self, task_result):
         """Check if task requires Human-in-the-Loop review."""
-        # Finance > $50
+        # Finance > $50 (from spec)
         if task_result.get("task_type") == "finance":
             amount = task_result.get("amount", 0)
             if amount > 50:
                 return True
         
-        # Other sensitive categories
-        sensitive_types = ["politics", "health", "legal"]
-        if task_result.get("task_type") in sensitive_types:
+        # Other sensitive categories (extendable)
+        sensitive_categories = ["politics", "health", "legal", "security"]
+        if task_result.get("task_type") in sensitive_categories:
             return True
         
         return False
