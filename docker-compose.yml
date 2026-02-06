@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: chimera
+    ports:
+      - "5433:5432"  # <--- Change the first number to 5433
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      # Use the internal service name 'db' to talk to the database
+      DATABASE_URL: postgresql://user:pass@db:5432/chimera
+      CHIMERA_ENV: production

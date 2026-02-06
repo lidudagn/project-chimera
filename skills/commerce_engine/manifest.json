@@ -1,0 +1,19 @@
+{
+  "skill_name": "commerce_engine",
+  "version": "1.0.0",
+  "description": "Enables economic agency via Coinbase AgentKit",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "action": { "enum": ["transfer", "check_balance", "request_faucet"] },
+      "amount": { "type": "number" },
+      "currency": { "type": "string", "default": "eth" },
+      "destination": { "type": "string" }
+    },
+    "required": ["action"]
+  },
+  "output_contract": {
+    "status": "string",
+    "transaction_hash": "string"
+  }
+}
