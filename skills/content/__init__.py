@@ -1,7 +1,11 @@
 """
-$(basename "$dir") skill package for Project Chimera
+Content Skill Package for Project Chimera
+Exposes tools for multimodal content generation (Text, Image, Video).
 """
 
-__version__ = "0.1.0"
+# This assumes your logic file is named generator.py
+# and it contains a function or class to handle creative tasks.
+from .generator import ContentGenerator 
 
-# This package will contain skills for $(basename "$dir") operations
+__all__ = ["ContentGenerator"]
+__version__ = "0.1.0"

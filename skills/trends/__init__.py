@@ -1,7 +1,10 @@
 """
-$(basename "$dir") skill package for Project Chimera
+Trends Skill Package for Project Chimera
+Exposes tools for market perception and social trend analysis.
 """
 
-__version__ = "0.1.0"
+# Import the actual logic from your script
+from .trend_fetcher import fetch_trends 
 
-# This package will contain skills for $(basename "$dir") operations
+__all__ = ["fetch_trends"]
+__version__ = "0.1.0"
