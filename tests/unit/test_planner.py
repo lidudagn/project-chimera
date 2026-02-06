@@ -1,5 +1,6 @@
 from agents.planner.task_decomposer import Planner  
 import pytest
+from datetime import datetime, timezone
 
 def test_planner_exists():
     """Test we can create a Planner instance"""
@@ -26,11 +27,7 @@ def test_planner_assigns_tasks_evenly():
     campaign_goals = {"objective": "Test campaign", "budget": 500}
     workers = ["worker_1", "worker_2", "worker_3"]
     
-    # This will fail - assign_tasks() doesn't exist yet!
     assignments = planner.assign_tasks(campaign_goals, workers)
-    
-    # From spec: "Tasks are evenly distributed among available Workers"
-    # From spec: "No Worker receives duplicate tasks"
     
     # Check all workers received assignments
     for worker in workers:
@@ -75,11 +72,11 @@ def test_tasks_have_valid_structure():
         assert task["priority"] in valid_priorities, \
             f"Priority '{task['priority']}' not in {valid_priorities}"
         
-        # Deadline should be valid ISO format
-        from datetime import datetime
+        # Deadline validation
         try:
+            # FIXED: Replace Z with +00:00 for ISO parsing and compare against aware UTC now
             deadline = datetime.fromisoformat(task["deadline"].replace('Z', '+00:00'))
-            assert deadline > datetime.now(), "Deadline should be in future"
+            assert deadline > datetime.now(timezone.utc), "Deadline should be in future"
         except ValueError:
             pytest.fail(f"Invalid deadline format: {task['deadline']}")
 
@@ -89,7 +86,7 @@ def test_planner_generates_correct_task_count():
     
     test_cases = [
         ({"budget": 50}, 1),    # $50 → 1 task (minimum)
-        ({"budget": 250}, 2),   # $250 → 2 tasks (250/100 = 2.5 → floor = 2)
+        ({"budget": 250}, 2),   # $250 → 2 tasks (250/100 = 2)
         ({"budget": 500}, 5),   # $500 → 5 tasks
         ({"budget": 1200}, 12), # $1200 → 12 tasks
     ]
