@@ -1,8 +1,9 @@
 """Database models for Project Chimera."""
-from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON, Boolean
+import os
+from datetime import datetime
+from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
 
 Base = declarative_base()
 
@@ -12,33 +13,28 @@ class Task(Base):
     
     id = Column(Integer, primary_key=True)
     task_id = Column(String, unique=True, nullable=False)
-    agent_id = Column(String)  # Which agent created/processed
-    action = Column(String)    # create, execute, evaluate, etc.
-    status = Column(String)    # pending, in_progress, completed, failed
-    confidence = Column(Float) # 0.0-1.0
-    spec = Column(JSON)        # Task specification
-    result = Column(JSON)      # Execution result
-    error = Column(JSON)       # Error details if failed
+    agent_id = Column(String)
+    action = Column(String)
+    status = Column(String)
+    confidence = Column(Float)
+    spec = Column(JSON)
+    result = Column(JSON)
+    error = Column(JSON)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class HITLReview(Base):
-    """Human-in-the-Loop review queue."""
-    __tablename__ = 'hitl_reviews'
-    
-    id = Column(Integer, primary_key=True)
-    task_id = Column(String, unique=True, nullable=False)
-    reason = Column(String)     # Why HITL required
-    priority = Column(String)   # low, medium, high, critical
-    status = Column(String)     # pending, reviewed, approved, rejected
-    reviewer = Column(String)   # Human reviewer ID
-    reviewed_at = Column(DateTime)
-    decision = Column(JSON)     # Human decision
-    created_at = Column(DateTime, default=datetime.utcnow)
+def init_db(db_url=None):
+    if db_url is None:
+        if os.getenv("CHIMERA_ENV") == "testing":
+            db_url = "sqlite:///:memory:"
+        else:
+            db_url = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost/chimera")
 
-# Database setup
-def init_db(db_url="postgresql://user:pass@localhost/chimera"):
-    engine = create_engine(db_url)
+    connect_args = {}
+    if db_url.startswith("sqlite"):
+        connect_args = {"check_same_thread": False}
+
+    engine = create_engine(db_url, connect_args=connect_args)
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     return Session()
