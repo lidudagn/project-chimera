@@ -1,0 +1,15 @@
+[flake8]
+# Tell the Governor to look only at your code, not the libraries
+exclude = 
+    .venv,
+    .git,
+    __pycache__,
+    build,
+    dist
+
+# Standard quality settings
+max-line-length = 88
+extend-ignore = E203
+
+# Only report on your actual logic errors
+select = E9,F63,F7,F82
