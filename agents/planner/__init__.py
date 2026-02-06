@@ -1,1 +1,1 @@
-from .task_decomposer import Planner
+from .task_decomposer import TaskDecomposer

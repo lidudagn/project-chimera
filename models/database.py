@@ -1,40 +1,35 @@
-"""Database models for Project Chimera."""
+from sqlalchemy import Column, String, Float, ForeignKey, create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 import os
-from datetime import datetime
-from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, JSON
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
-class Task(Base):
-    """Task table for audit logging."""
-    __tablename__ = 'tasks'
+class Campaign(Base):
+    __tablename__ = 'campaigns'
+    id = Column(String, primary_key=True)
+    objective = Column(String, nullable=False)
+    budget = Column(Float, nullable=False)
+    status = Column(String, default="active")
     
-    id = Column(Integer, primary_key=True)
-    task_id = Column(String, unique=True, nullable=False)
-    agent_id = Column(String)
+    # Relationship to tasks
+    tasks = relationship("Task", back_populates="campaign")
+
+class Task(Base):
+    __tablename__ = 'tasks'
+    id = Column(String, primary_key=True)
+    campaign_id = Column(String, ForeignKey('campaigns.id'))
+    assigned_to = Column(String)
     action = Column(String)
-    status = Column(String)
-    confidence = Column(Float)
-    spec = Column(JSON)
-    result = Column(JSON)
-    error = Column(JSON)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    status = Column(String, default="pending")
+    result = Column(String, nullable=True)
 
-def init_db(db_url=None):
-    if db_url is None:
-        if os.getenv("CHIMERA_ENV") == "testing":
-            db_url = "sqlite:///:memory:"
-        else:
-            db_url = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost/chimera")
+    # Relationship back to campaign
+    campaign = relationship("Campaign", back_populates="tasks")
 
-    connect_args = {}
-    if db_url.startswith("sqlite"):
-        connect_args = {"check_same_thread": False}
-
-    engine = create_engine(db_url, connect_args=connect_args)
+def init_db():
+    db_url = os.getenv("DATABASE_URL", "postgresql://user:pass@db:5432/chimera")
+    engine = create_engine(db_url)
+    # This is where the magic happens - it creates the tables
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     return Session()
