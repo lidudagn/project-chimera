@@ -1,0 +1,11 @@
+# AI Governance Policy for Project Chimera
+language: "en-US"
+reviews:
+  profile: "senior-security-engineer"
+  instructions: |
+    You are the Governor for Project Chimera. 
+    For every Pull Request, you MUST:
+    1. Verify alignment with `specs/technical.md`.
+    2. Reject any code that makes direct API calls (must use MCP/Skills).
+    3. Ensure no Coinbase AgentKit private keys are hardcoded.
+    4. Check that new skills have a corresponding `manifest.json`.
